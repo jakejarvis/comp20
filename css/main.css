@@ -40,7 +40,6 @@ div#header a#current {
 }
 
 div#home, div#bio, div#resume {
-    width: 600px;
     margin-left: auto;  /* https://stackoverflow.com/questions/396145/how-to-vertically-center-a-div-for-all-browsers */
     margin-right: auto;
     margin-top: 20px;
@@ -48,6 +47,7 @@ div#home, div#bio, div#resume {
 }
 
 div#home {
+    width: 600px;
     text-align: center;
 }
 
@@ -56,7 +56,18 @@ div#home img#me {
     height: 400px;
 }
 
+div#bio {
+    width: 800px;
+    text-align: center;
+}
+
+div#bio span.bold {
+    color: #666666;
+    font-weight: bold;
+}
+
 div#resume {
+    width: 600px;
     font-size: 16px;
 }
 
