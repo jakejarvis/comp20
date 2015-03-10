@@ -1,3 +1,7 @@
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, serif;
+}
+
 .message {
     -moz-border-radius: 15px;
     -webkit-border-radius: 15px;
@@ -6,11 +10,12 @@
     background-color: #99ff99;
     padding: 10px;
     margin-right: 10px;
-    margin-top: 15px;
-    margin-bottom: 15px;
     text-indent: 10px;
+    display: inline-block;
 }
 
 .username {
-
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 13px;
 }
