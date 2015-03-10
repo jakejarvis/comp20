@@ -26,5 +26,5 @@ send the cookies from facebook.com to their own server, which would
 allow them to log into Facebook as the user.
 
 Our lab JavaScript cannot acccess files from messagehub.herokuapp.com 
-because the server does not allow tuftsdev.github.io or out local 
+because the server does not allow tuftsdev.github.io or our local 
 machine as an origin using CORS.
