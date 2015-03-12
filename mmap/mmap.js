@@ -35,20 +35,19 @@ function renderMap() {
     gmap.panTo(me);
 
     marker = new google.maps.Marker({
-                position: me,
-                title: "This is me, " + myLogin + "."
+        position: me,
+        title: "This is me, " + myLogin + ".",
+        icon: "panda-icon.png"
     });
     marker.setMap(gmap);
 
-
-
-                    google.maps.event.addListener(marker, 'click',
-                        function() {
-                            info.close();
-                            info.setContent(this.title);
-                            info.open(gmap, this);
-                        }
-                    );
+    google.maps.event.addListener(marker, 'click',
+        function() {
+            info.close();
+            info.setContent(this.title);
+            info.open(gmap, this);
+        }
+    );
 
     reportLocation(me);
 }
