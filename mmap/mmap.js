@@ -62,8 +62,6 @@ function reportLocation(pos) {
     request.send("login=" + myLogin +
                  "&lat="  + pos.lat() +
                  "&lng="  + pos.lng());
-
-    console.log("Status: " + request.status);
 }
 
 function locateOthers() {
