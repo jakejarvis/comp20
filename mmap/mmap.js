@@ -2,7 +2,7 @@
 var myLat;
 var myLng;
 var me;
-var request = new XMLHttpRequest();
+var request;
 var gmap;
 var meMarker;
 
@@ -31,10 +31,15 @@ function locateMe() {
     } else {
         alert("Please try a different browser.");
     }
+
+
+
+
+
 }
 
 function renderMap() {
-    me = new google.maps.LatLng(myLat, myLng);
+me = new google.maps.LatLng(myLat, myLng);    
 
     gmap.panTo(me);
 
@@ -44,13 +49,59 @@ function renderMap() {
     });
     marker.setMap(gmap);
 
+    reportLocation(me);
+
     console.log("hi");
 }
 
 
+function reportLocation(pos) {
+
+    request = new XMLHttpRequest();
+    request.open("POST", "https://secret-about-box.herokuapp.com/sendLocation");
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.onreadystatechange = locateOthers;
+
+    var login = "ErinHair";
+
+    request.send("login=" + login +
+                 "&lat="  + pos.lat() +
+                 "&lng="  + pos.lng());
+
+    console.log("Status: " + request.status);
+}
+
+function locateOthers() {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
+            console.log("hello");
+
+            // JSON.parse(request.responseText)
+
+            var others = JSON.parse(request.responseText);
+
+            for(person in others) {
+                console.log(others[person]["login"]);
+
+                var person_pos = new google.maps.LatLng(others[person]["lat"], others[person]["lng"]);
+
+                var person_marker = new google.maps.Marker({
+                    position: person_pos,
+                    title: "Here lies " + others[person]["login"];
+                });
+
+                person_marker.setMap(gmap);
+            }
 
 
 
+
+
+        } else {
+            alert("Something went wrong. Please try again.");
+        }
+    }
+}
 
 
 
