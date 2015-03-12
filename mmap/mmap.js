@@ -4,6 +4,8 @@ var me;
 var request;
 var gmap;
 var meMarker;
+var myLogin = "ErinHair";
+var info = new google.maps.InfoWindow;
 
 function init() {
     /* Initialize map, zoom in on Tufts */
@@ -34,9 +36,19 @@ function renderMap() {
 
     marker = new google.maps.Marker({
                 position: me,
-                title: "Here I Am!"
+                title: "This is me, " + myLogin + "."
     });
     marker.setMap(gmap);
+
+
+
+                    google.maps.event.addListener(marker, 'click',
+                        function() {
+                            info.close();
+                            info.setContent(this.title);
+                            info.open(gmap, this);
+                        }
+                    );
 
     reportLocation(me);
 }
@@ -48,9 +60,7 @@ function reportLocation(pos) {
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.onreadystatechange = locateOthers;
 
-    var login = "ErinHair";
-
-    request.send("login=" + login +
+    request.send("login=" + myLogin +
                  "&lat="  + pos.lat() +
                  "&lng="  + pos.lng());
 
@@ -63,24 +73,24 @@ function locateOthers() {
             var others = JSON.parse(request.responseText);
 
             for(person in others) {
-                var personPos = new google.maps.LatLng(others[person]["lat"], others[person]["lng"]);
+                if(others[person]["login"] != myLogin) {
+                    var personPos = new google.maps.LatLng(others[person]["lat"], others[person]["lng"]);
 
-                var personMarker = new google.maps.Marker({
-                    position: personPos,
-                    title: "Here lies " + others[person]["login"] + ", " + calculateDistance(me, personPos) + " miles away."
-                });
+                    var personMarker = new google.maps.Marker({
+                        position: personPos,
+                        title: "Here lies " + others[person]["login"] + ", " + calculateDistance(me, personPos) + " miles away."
+                    });
 
-                personMarker.setMap(gmap);
+                    personMarker.setMap(gmap);
 
-                var info = new google.maps.InfoWindow;
-
-                google.maps.event.addListener(personMarker, 'click',
-                    function() {
-                        info.close();
-                        info.setContent(this.title);
-                        info.open(gmap, this);
-                    }
-                );
+                    google.maps.event.addListener(personMarker, 'click',
+                        function() {
+                            info.close();
+                            info.setContent(this.title);
+                            info.open(gmap, this);
+                        }
+                    );
+                }
             }
         } else {
             alert("Something went wrong. Please try again.");
