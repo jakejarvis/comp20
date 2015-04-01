@@ -12,16 +12,17 @@
         });
 
         function display() {
-            $("#log").html("");
+            $("#log").html("");  // start fresh every time we redraw the list
             for(key in localStorage) {
                 $("#log").prepend("<p>" + key + " - " + localStorage.getItem(key) + "</p>");
+                // key = the timestamp
             }
         }
 
         function store() {
             var now = new Date();
             localStorage.setItem(now, $("#msg").val());
-            $("#msg").val("");
+            $("#msg").val("");   // clear textbox after enter
             display();
         }
     </script>
