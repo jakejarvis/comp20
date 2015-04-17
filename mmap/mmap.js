@@ -55,7 +55,7 @@ function renderMap() {
 
 function reportLocation(pos) {
     request = new XMLHttpRequest();
-    request.open("POST", "https://secret-about-box.herokuapp.com/sendLocation");
+    request.open("POST", "https://fast-thicket-9263.herokuapp.com/sendLocation");
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.onreadystatechange = locateOthers;
 
