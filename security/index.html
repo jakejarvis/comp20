@@ -1,28 +1,52 @@
-<!-- frozen-temple-1955.herokuapp.com -->
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Assignment 4: Security Report</title>
+    <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="markdown.css"></link>
+    <link rel="stylesheet" type="text/css" href="style.css"></link>
 </head>
 <body>
-    <h1>Security Assessment of Eric Peterson's Marauder's Map</h1>
+    <h1>Security Assessment of Eric Peterson's <em>Marauder's Map</em></h1>
+    <h3></h3>
 
     <p>By <a href="mailto:jake.jarvis@tufts.edu">Jake Jarvis</a><br>April 24, 2015</p>
 
     <h2>Introduction</h2>
 
+    <p>I have been assigned to assess the security and privacy features (or lack thereof) of Eric Peterson's <a href="http://harrypotter.wikia.com/wiki/Marauder's_Map" target="_blank">Marauder's Map</a> client and server. His client is located <a href="https://tuftsdev.github.io/comp20-epeterson/mmap/" target="_blank">here</a> and his hosted Heroku server is located <a href="https://frozen-temple-1955.herokuapp.com/" target="_blank">here</a>.</p>
 
+    <p>The <a href="https://tuftsdev.github.io/WebProgramming/assignments/a2.html" target="_blank">specification for the client</a> involves a Google Map that pulls users and their cooresponding coordinates from a server for the purpose of displaying pinpoints on a large map. The <a href="https://tuftsdev.github.io/WebProgramming/assignments/a3.html" target="_blank">specification for the accompanying server</a> involves a <a href="https://nodejs.org/" target="_blank">Node.js</a> web app and <a href="https://www.mongodb.org/" target="_blank">MongoDB</a> database that work together to store these logins and coordinates. There are two ways to access these – an HTML list located at the root of the domain that displays all data, and a <a href="https://frozen-temple-1955.herokuapp.com/location.json" target="_blank">location.json</a> file that returns all coordinates in JSON format for a given login. Coordinates are stored by way of a POST request to this server.</p>
+
+    <p>For the purpose of this report, I will try my best to break his code or, in other words, make it do things that Eric did not intend it to do &mdash; whether that results in danger (cross-site scripting), manipulation (fake coordinates or spoofed logins), or humor (displaying memes instead of coordinates).</p>
 
     <h2>Methodology</h2>
 
- 
+    <p>I will begin by treating Eric's Heroku server as a black box. In other words, I will not look at his code just yet.</p>
+
+    <p>My first focus will be on data I am able to submit to the Heroku server. If Eric followed the specifications, I should be allowed to submit anything to each of the three fields (login, lat, lng), most importantly any HTML and JavaScript. This will allow me to do anything from display images to execute JavaScript on both the list of users on the server page as well as the map client. This is known as <a href="https://www.google.com/about/appsecurity/learning/xss/" target="_blank">cross-site scripting</a> (XSS).</p>
+
+    <p>I can easily test for XSS by executing a simple JS command like <code>&lt;script&gt;alert('Uh oh...')&lt;/script&gt;</code>, which will tell the browser to display a pop-up window:</p>
+
+    <p class="center"><img src="img/alert.png" alt="Alert window" style="height:250px;"></p>
+
+    <p>I can do this by injecting it into the login parameter when sending a POST request to the /sendLocation endpoint using CURL on my command line. If this works, I will delve much deeper into the most dangerous types of scripts I can execute on the browsers of whoever uses his map client.</p>
+
+    <p><code>curl --data "login=<strong><em>&lt;script&gt;alert('Uh oh...')&lt;/script&gt;</em></strong>&amp;lat=1&amp;lng=1" https://frozen-temple-1955.herokuapp.com/sendLocation</code></p>
+
+    <p></p>
+
+
 
     <h2>Abstract of Findings</h2>
 
+    <p>Most of Eric's vulnerabilities come down to one mistake: he trusts the user to give valid input instead of enforcing some basic rules on his end.</p>
 
+    <p>Fortunately, Eric checked for valid coordinates by using <code>isNaN()</code> on the lat and lng parameters to ensure that they are numbers. However, the login paramater will accept any input, including the "Uh oh!" alert window code described above. This means I can execute <em>any</em> HTML or JavaScript, including the use of <code>&lt;script src="...."&gt;&lt;script&gt;</code> to point to a .js file on my own server. Easy peasy!</p>
+
+    <p>Privacy-wise, it should be obvious to any internet user that making an entirely public list of the exact coordinates of your users isn't the best idea. While this is somewhat the purpose of a Marauder's Map, there are more sensitive ways to dispense this information to authorized eyes only.</p>
+
+    <p>More on these issues and their potential fixes below.</p>
 
     <h2>Issues Found</h2>
 
