@@ -69,16 +69,16 @@
         <li><ul>
             <li><strong>Issue:</strong> File uploading</li>
             <li><strong>Location:</strong> /sendLocation endpoint</li>
-            <li><strong>Severity:</strong> <span style="color:#ff0000;"><strong>MEDIUM.</strong></span> This could quickly deplete the resources Heroku allocates to you on the free tier.</li>
+            <li><strong>Severity:</strong> <span style="color:#ffa500;"><strong>MEDIUM.</strong></span> This could quickly deplete the resources Heroku allocates to you on the free tier.</li>
             <li><strong>Description:</strong> By <a href="http://www.base64-image.de" target="_blank">converting an image to base64</a>, I was able to display an image on the homepage without hosting the .JPG file anywhere. I am sure there are ways to do this to all file types, including and especially larger files like video or PDFs.</li>
-            <li><strong>Proof:</strong> </li>
-            <li><strong>Resolution:</strong> </li>
+            <li><strong>Proof:</strong>   <p class="center"><img src="img/image.png" alt="Embedded image" style="height:150px;"></p></li>
+            <li><strong>Resolution:</strong> Enforcing plaintext without special characters for the login paramater, as described above, would help alleviate this issue. Additionally, it might be a good idea to set a maximum length for the login parameter &mdash; my image data was over 10,000 characters, but a username should be no more than a couple dozen characters.</li>
         </ul></li>
 
         <li><ul>
             <li><strong>Issue:</strong> List of users and their locations are open to the public</li>
             <li><strong>Location:</strong> <a href="https://frozen-temple-1955.herokuapp.com/" target="_blank">root of server</a></li>
-            <li><strong>Severity:</strong> <span style="color:#ffa500"><strong>MEDIUM.</strong></span>. This was not a requirement in our specifications. You would also need to know this random URL.</li>
+            <li><strong>Severity:</strong> <span style="color:#ffa500"><strong>MEDIUM.</strong></span> This was not a requirement in our specifications. You would also need to know this random URL.</li>
             <li><strong>Description:</strong> Anyone can access the exact coordinates of the users of this app. Even though we didn't use our real names as our logins, this is still a rather creepy aspect of this server...</li>
             <li><strong>Proof:</strong> There's a list!</li>
             <li><strong>Resolution:</strong> Add a login system so that authenticated users can see the locations of other authenticated users. Or create one common passphrase that everyone needs to use.</li>
@@ -87,7 +87,7 @@
 
     <h2>Conclusion</h2>
 
-    <p>I ran into no surprises when assessing the holes of Eric's server and client. He conformed to the specifications for Assignments 2 &amp; 3. However, this experiment underlies the importance of <em>never</em> trusting your users. Even though the developer expected plaintext to be submitted through the login field, anything could be submitted in reality. (It's worth giving him an A for effort for checking that the lat and lng were numbers, though!)
+    <p>I ran into no surprises when assessing the holes of Eric's server and client. He conformed to the specifications for Assignments 2 &amp; 3. However, this experiment underlies the importance of <em>never</em> trusting your users. Even though the developer expected plaintext to be submitted through the login field, anything could be submitted in reality. (It's worth giving him an A for effort for checking that the lat and lng were numbers, though!)</p>
 
     <p>All web developers should know that these checks are incredibly trivial to implement. If you're a web developer who is paying someone to tell you these things, you should probably reevaluate your career choice.</p>
 
