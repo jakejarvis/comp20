@@ -16,6 +16,10 @@
 
     <p>I have been assigned to assess the security and privacy features (or lack thereof) of Eric Peterson's <a href="http://harrypotter.wikia.com/wiki/Marauder's_Map" target="_blank">Marauder's Map</a> client and server. His client is located <a href="https://tuftsdev.github.io/comp20-epeterson/mmap/" target="_blank">here</a> and his hosted Heroku server is located <a href="https://frozen-temple-1955.herokuapp.com/" target="_blank">here</a>.</p>
 
+    <p>The concept of a <a href="http://harrypotter.wikia.com/wiki/Marauder's_Map" target="_blank">Marauder's Map</a> is simple. It shows every inch of Hogwarts, identifying every person on campus and even revealing secret passages. In our case, our map will show the precise location of every one of our users.</p> 
+
+    <p><iframe width="100%" height="420" src="https://www.youtube.com/embed/9G_SdCcYFJw?rel=0&amp;t=29s" frameborder="0" allowfullscreen></iframe></p>
+
     <p>The <a href="https://tuftsdev.github.io/WebProgramming/assignments/a2.html" target="_blank">specification for the client</a> involves a Google Map that pulls users and their cooresponding coordinates from a server for the purpose of displaying pinpoints on a large map. The <a href="https://tuftsdev.github.io/WebProgramming/assignments/a3.html" target="_blank">specification for the accompanying server</a> involves a <a href="https://nodejs.org/" target="_blank">Node.js</a> web app and <a href="https://www.mongodb.org/" target="_blank">MongoDB</a> database that work together to store these logins and coordinates. There are two ways to access these – an HTML list located at the root of the domain that displays all data, and a <a href="https://frozen-temple-1955.herokuapp.com/location.json" target="_blank">location.json</a> file that returns all coordinates in JSON format for a given login. Coordinates are stored by way of a POST request to this server.</p>
 
     <p>For the purpose of this report, I will try my best to break his code or, in other words, make it do things that Eric did not intend it to do &mdash; whether that results in danger (cross-site scripting), manipulation (fake coordinates or spoofed logins), or humor (displaying memes instead of coordinates).</p>
@@ -42,9 +46,9 @@
 
     <p>Most of Eric's vulnerabilities come down to one mistake: he trusts the user to give valid input instead of enforcing some basic rules on his end.</p>
 
-    <p>Fortunately, Eric checked for valid coordinates by using <code>isNaN()</code> on the lat and lng parameters to ensure that they are numbers. However, the login paramater will accept any input, including the "Uh oh!" alert window code described above. This means I can execute <em>any</em> HTML or JavaScript, including the use of <code>&lt;script src="...."&gt;&lt;script&gt;</code> to point to a .js file on my own server. Easy peasy!</p>
+    <p>Fortunately, Eric checked for valid coordinates by using <code>isNaN()</code> on the lat and lng parameters to ensure that they are numbers. However, the login paramater will accept any input, including the "Uh oh!" alert window code described above. This means I was successful and this server is fully vulnerable to XSS. I can now execute <em>any</em> HTML or JavaScript, including the use of <code>&lt;script src="...."&gt;&lt;script&gt;</code> to point to a .js file on my own server. Easy peasy!</p>
 
-    <p>Privacy-wise, it should be obvious to any internet user that making an entirely public list of the exact coordinates of your users isn't the best idea. While this is somewhat the purpose of a Marauder's Map, there are more sensitive ways to dispense this information to authorized eyes only.</p>
+    <p>Privacy-wise, it should be obvious to any internet user that making an entirely public list of the exact coordinates of your users isn't the best idea. This is a bit of a conundrum, though; the <a href="http://harrypotter.wikia.com/wiki/Marauder's_Map#Usage" target="_blank">purpose</a> of a Marauder's Map is to know where <em>everybody</em> is without prejudice. However, there are more sensitive ways to dispense this information to authorized eyes only.</p>
 
     <p>More on these issues and their potential fixes below.</p>
 
@@ -52,26 +56,40 @@
 
     <ol>
         <li><ul>
-            <li><strong>Issue:</strong> asdf</li>
-            <li><strong>Location:</strong> asdf</li>
-            <li><strong>Severity:</strong> asdf</li>
-            <li><strong>Description:</strong> asdf</li>
-            <li><strong>Proof:</strong> asdf</li>
-            <li><strong>Resolution:</strong> asdf</li>
+            <li><strong>Issue:</strong> Cross-site scripting (XSS)</li>
+            <li><strong>Location:</strong> /sendLocation endpoint</li>
+            <li><strong>Severity:</strong> <span style="color:#ff0000;"><strong>HIGH.</strong></span> This allows code that was not written by Eric to be executed on his users' browsers.</li>
+            <li><strong>Description:</strong> As described above, I was able to submit a short JavaScript program disguised as the login parameter, which prompted an alert window on the browser trying to view the HTML list of users and their locations. I was also able to submit HTML to display an embedded webpage using the <code>&lt;iframe&gt;</code> tag.</li>
+            <li><strong>Proof:</strong> If you visit <a href="https://frozen-temple-1955.herokuapp.com/" target="_blank">frozen-temple-1955.herokuapp.com</a>, you will get a popup window that looks like this:<p class="center"><img src="img/alert.png" alt="Alert window" style="height:250px;"></p><p>...and an embedded webpage that looks like this:</p><p class="center"><img src="img/iframe.png" alt="iframe example" style="height:350px;"></p><p>It's worth noting that this JavaScript is not executed when it is pulled for the purpose of labeling a Google Maps pinpoint.</li>
+            <li><strong>Resolution:</strong> It is always a good idea to sanitize user input by detecting and escaping characters that could be interpreted as HTML, namely the less than <code>&lt;</code> and greater-than <code>&gt;</code> signs. You can do this in JavaScript using the <code>replace()</code> function:
+            <p><code>login.replace(/&amp;/g, &quot;&amp;amp;&quot;).replace(/&lt;/g, &quot;&amp;lt;&quot;).replace(/&gt;/g, &quot;&amp;gt;&quot;);</code> <small>(<a href="http://shebang.brandonmintern.com/foolproof-html-escaping-in-javascript/" target="_blank">source</a>)</small></p>
+            </li>
         </ul></li>
 
         <li><ul>
-            <li><strong>Issue:</strong> asdf</li>
-            <li><strong>Location:</strong> asdf</li>
-            <li><strong>Severity:</strong> asdf</li>
-            <li><strong>Description:</strong> asdf</li>
-            <li><strong>Proof:</strong> asdf</li>
-            <li><strong>Resolution:</strong> asdf</li>
+            <li><strong>Issue:</strong> File uploading</li>
+            <li><strong>Location:</strong> /sendLocation endpoint</li>
+            <li><strong>Severity:</strong> <span style="color:#ff0000;"><strong>MEDIUM.</strong></span> This could quickly deplete the resources Heroku allocates to you on the free tier.</li>
+            <li><strong>Description:</strong> By <a href="http://www.base64-image.de" target="_blank">converting an image to base64</a>, I was able to display an image on the homepage without hosting the .JPG file anywhere. I am sure there are ways to do this to all file types, including and especially larger files like video or PDFs.</li>
+            <li><strong>Proof:</strong> </li>
+            <li><strong>Resolution:</strong> </li>
+        </ul></li>
+
+        <li><ul>
+            <li><strong>Issue:</strong> List of users and their locations are open to the public</li>
+            <li><strong>Location:</strong> <a href="https://frozen-temple-1955.herokuapp.com/" target="_blank">root of server</a></li>
+            <li><strong>Severity:</strong> <span style="color:#ffa500"><strong>MEDIUM.</strong></span>. This was not a requirement in our specifications. You would also need to know this random URL.</li>
+            <li><strong>Description:</strong> Anyone can access the exact coordinates of the users of this app. Even though we didn't use our real names as our logins, this is still a rather creepy aspect of this server...</li>
+            <li><strong>Proof:</strong> There's a list!</li>
+            <li><strong>Resolution:</strong> Add a login system so that authenticated users can see the locations of other authenticated users. Or create one common passphrase that everyone needs to use.</li>
         </ul></li>
     </ol>
 
     <h2>Conclusion</h2>
 
+    <p>I ran into no surprises when assessing the holes of Eric's server and client. He conformed to the specifications for Assignments 2 &amp; 3. However, this experiment underlies the importance of <em>never</em> trusting your users. Even though the developer expected plaintext to be submitted through the login field, anything could be submitted in reality. (It's worth giving him an A for effort for checking that the lat and lng were numbers, though!)
+
+    <p>All web developers should know that these checks are incredibly trivial to implement. If you're a web developer who is paying someone to tell you these things, you should probably reevaluate your career choice.</p>
 
 </body>
 </html>
